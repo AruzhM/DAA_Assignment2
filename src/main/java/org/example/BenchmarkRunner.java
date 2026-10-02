@@ -37,6 +37,12 @@ public class BenchmarkRunner {
 
             benchmarkW2("DynamicArray", n, queries, csv);
             benchmarkW2("MyLinkedList", n, queries, csv);
+
+            benchmarkW3("DynamicArray", n, "head", csv);
+            benchmarkW3("MyLinkedList", n, "head", csv);
+
+            benchmarkW3("DynamicArray", n, "middle", csv);
+            benchmarkW3("MyLinkedList", n, "middle", csv);
         }
 
         Path output = Path.of("results", "results.csv");
@@ -257,6 +263,101 @@ public class BenchmarkRunner {
         csv.append(row);
         System.out.print(row);
     }
-}
+
+        private static Measurement runW3(
+                String structure, int n, String variant
+    ) {
+            IntList list = createList(structure, n);
+
+            int index;
+
+            if (variant.equals("head")) {
+                index = 0;
+            } else if (variant.equals("middle")) {
+                index = n / 2;
+            } else {
+                throw new IllegalArgumentException(
+                        "Unknown variant: " + variant
+                );
+            }
+
+            long checksum = 0;
+
+            long start = System.nanoTime();
+
+            for (int i = 0; i < 1000; i++) {
+                list.add(index, -1);
+                checksum += list.remove(index);
+            }
+
+            long elapsed = System.nanoTime() - start;
+            sink = checksum;
+
+            Measurement result = new Measurement(
+                    elapsed,
+                    list.getSteps(),
+                    list.getMoves(),
+                    list.getComparisons()
+            );
+
+            if (checksum != -1000 || list.size() != n) {
+                throw new IllegalStateException("W3 result mismatch");
+            }
+            int[] checkIndices = {0, n / 2, n - 1};
+
+            for (int i : checkIndices) {
+                if (list.get(i) != i) {
+                    throw new IllegalStateException(
+                            "W3 contents mismatch at index " + i
+                    );
+                }
+            }
+
+            if (result.comparisons() != 0) {
+                throw new IllegalStateException(
+                        "W3 unexpected value comparisons"
+                );
+            }
+
+            return result;
+        }
+
+
+            private static void benchmarkW3(
+                    String structure, int n, String variant,
+                    StringBuilder csv
+            ) {
+                for (int warmup = 0; warmup < 5; warmup++) {
+                    runW3(structure, n, variant);
+                }
+
+                Measurement[] results = new Measurement[RUNS];
+
+                for (int run = 0; run < RUNS; run++) {
+                    results[run] = runW3(structure, n, variant);
+                }
+
+                Arrays.sort(results,
+                        (a, b) -> Long.compare(a.nanos(), b.nanos()));
+
+                Measurement median = results[RUNS / 2];
+
+                String row = String.format(
+                        Locale.US,
+                        "W3,%s,%s,%d,%.6f,%d,%d,%d%n",
+                        variant,
+                        structure,
+                        n,
+                        median.nanos() / 1_000_000.0,
+                        median.steps(),
+                        median.moves(),
+                        median.comparisons()
+                );
+
+                csv.append(row);
+                System.out.print(row);
+            }
+    }
+
 
 
