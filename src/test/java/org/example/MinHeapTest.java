@@ -5,6 +5,10 @@ import org.junit.jupiter.api.Test;
 import java.util.PriorityQueue;
 import java.util.Random;
 
+
+import java.util.Arrays;
+
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -224,5 +228,102 @@ public class MinHeapTest {
                 () -> actual.extractMin());
     }
 
+    @Test
+    void buildsHeapFromArrayWithoutChangingInput() {
+        MinHeap heap = new MinHeap();
+
+        int[] values = {9, -3, 7, 7, 0, 15, -8};
+        int[] original = values.clone();
+        int[] sorted = values.clone();
+        Arrays.sort(sorted);
+
+        heap.buildHeap(values);
+
+        assertArrayEquals(original, values);
+        assertEquals(values.length, heap.size());
+        assertTrue(heap.isValidHeap());
+
+        values[0] = Integer.MIN_VALUE;
+
+        for (int value : sorted) {
+            assertEquals(value, heap.extractMin());
+            assertTrue(heap.isValidHeap());
+        }
+
+        assertEquals(0, heap.size());
+    }
+
+    @Test
+    void buildHeapHandlesEmptyAndSingleElementArrays() {
+        MinHeap heap = new MinHeap();
+
+        heap.buildHeap(new int[0]);
+
+        assertEquals(0, heap.size());
+        assertTrue(heap.isValidHeap());
+        assertThrows(IllegalStateException.class,
+                () -> heap.peekMin());
+
+        heap.insert(5);
+        assertEquals(5, heap.extractMin());
+
+        heap.buildHeap(new int[]{-7});
+
+        assertEquals(1, heap.size());
+        assertEquals(-7, heap.peekMin());
+        assertTrue(heap.isValidHeap());
+        assertEquals(-7, heap.extractMin());
+    }
+
+    @Test
+    void buildHeapReplacesContentsAndSupportsInsertion() {
+        MinHeap heap = new MinHeap();
+        heap.insert(-100);
+
+        heap.buildHeap(new int[]{
+                10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+        });
+
+        assertEquals(10, heap.size());
+        assertEquals(1, heap.peekMin());
+        assertTrue(heap.isValidHeap());
+        heap.insert(0);
+
+        assertEquals(11, heap.size());
+        assertTrue(heap.isValidHeap());
+
+        for (int i = 0; i <= 10; i++) {
+            assertEquals(i, heap.extractMin());
+            assertTrue(heap.isValidHeap());
+        }
+        assertEquals(0, heap.size());
+    }
+
+    @Test
+    void buildsHeapFromRandomValues() {
+        MinHeap heap = new MinHeap();
+        Random random = new Random(42);
+
+        int[] values = new int[1000];
+
+        for (int i = 0; i < values.length; i++) {
+            values[i] = random.nextInt();
+        }
+
+        int[] sorted = values.clone();
+        Arrays.sort(sorted);
+
+        heap.buildHeap(values);
+
+        assertEquals(values.length, heap.size());
+        assertTrue(heap.isValidHeap());
+
+        for (int value : sorted) {
+            assertEquals(value, heap.extractMin());
+            assertTrue(heap.isValidHeap());
+        }
+
+        assertEquals(0, heap.size());
+    }
 
 }

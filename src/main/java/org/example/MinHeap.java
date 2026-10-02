@@ -142,5 +142,25 @@ public class MinHeap {
 
         return true;
     }
+
+
+    public void buildHeap(int[] values) {
+        if (values == null) {
+            throw new IllegalArgumentException("Values must not be null");
+        }
+
+        data = new int[Math.max(10, values.length)];
+        size = values.length;
+
+        for (int i = 0; i < size; i++) {
+            data[i] = values[i];
+            steps++;
+            moves++;
+        }
+
+        for (int i = size / 2 - 1; i >= 0; i--) {
+            siftDown(i);
+        }
+    }
 }
 
