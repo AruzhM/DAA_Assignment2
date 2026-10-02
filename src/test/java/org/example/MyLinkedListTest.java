@@ -3,6 +3,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class MyLinkedListTest {
 
     @Test
@@ -284,5 +287,57 @@ public class MyLinkedListTest {
         assertEquals(0L, list.getMoves());
         assertEquals(3, list.size());
     }
+
+
+    @Test
+    void matchesArrayListOnRandomOperations() {
+        MyLinkedList actual = new MyLinkedList();
+        ArrayList<Integer> expected = new ArrayList<>();
+        Random random = new Random(42);
+
+        for (int step = 0; step < 2000; step++) {
+            int operation = random.nextInt(5);
+            int value = random.nextInt(101) - 50;
+
+            if (operation == 0) {
+                actual.add(value);
+                expected.add(value);
+
+            } else if (operation == 1) {
+                int index = random.nextInt(expected.size() + 1);
+
+                actual.add(index, value);
+                expected.add(index, value);
+
+            } else if (operation == 2 && !expected.isEmpty()) {
+                int index = random.nextInt(expected.size());
+
+                int expectedRemoved = expected.remove(index);
+                assertEquals(expectedRemoved, actual.remove(index),
+                        "Removal mismatch at step " + step);
+
+            } else if (operation == 3 && !expected.isEmpty()) {
+                int index = random.nextInt(expected.size());
+
+                assertEquals(expected.get(index).intValue(),
+                        actual.get(index),
+                        "Access mismatch at step " + step);
+
+            } else {
+                assertEquals(expected.contains(value),
+                        actual.contains(value),
+                        "Search mismatch at step " + step);
+            }
+
+            assertEquals(expected.size(), actual.size(),
+                    "Size mismatch at step " + step);
+
+            for (int i = 0; i < expected.size(); i++) {
+                assertEquals(expected.get(i).intValue(), actual.get(i),
+                        "Value mismatch at step " + step + ", index " + i);
+            }
+        }
+    }
+
 
 }
