@@ -44,7 +44,6 @@ public class MyLinkedListTest {
     }
 
 
-
     @Test
     void countsLinkUpdatesAndTraversal() {
         MyLinkedList list = new MyLinkedList();
@@ -72,6 +71,73 @@ public class MyLinkedListTest {
         assertEquals(0L, list.getMoves());
         assertEquals(0L, list.getComparisons());
         assertEquals(3, list.size());
+    }
+
+
+    @Test
+    void insertsAtBeginningMiddleAndEnd() {
+        MyLinkedList list = new MyLinkedList();
+
+        list.add(0, 20);
+        list.add(0, 10);
+        list.add(1, 15);
+        list.add(3, 30);
+        list.add(40);
+
+
+        assertEquals(5, list.size());
+        assertEquals(10, list.get(0));
+        assertEquals(15, list.get(1));
+        assertEquals(20, list.get(2));
+        assertEquals(30, list.get(3));
+        assertEquals(40, list.get(4));
+    }
+
+    @Test
+    void rejectsInvalidInsertionIndices() {
+        MyLinkedList list = new MyLinkedList();
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> list.add(-1, 99));
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> list.add(1, 99));
+
+        list.add(10);
+
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> list.add(2, 99));
+
+        assertEquals(1, list.size());
+        assertEquals(10, list.get(0));
+    }
+
+
+    @Test
+    void countsIndexedInsertionOperations() {
+        MyLinkedList list = new MyLinkedList();
+        list.add(10);
+        list.add(20);
+        list.add(30);
+
+        list.resetMetrics();
+        list.add(0, 5);
+
+        assertEquals(0L, list.getSteps());
+        assertEquals(2L, list.getMoves());
+        assertEquals(0L, list.getComparisons());
+
+        list.resetMetrics();
+        list.add(2, 15);
+
+        assertEquals(1L, list.getSteps());
+        assertEquals(2L, list.getMoves());
+        assertEquals(0L, list.getComparisons());
+
+        list.resetMetrics();
+        list.add(list.size(), 40);
+
+        assertEquals(0L, list.getSteps());
+        assertEquals(2L, list.getMoves());
+        assertEquals(0L, list.getComparisons());
     }
 
 }

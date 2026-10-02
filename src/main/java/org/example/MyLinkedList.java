@@ -71,4 +71,43 @@ public class MyLinkedList {
         moves = 0;
         comparisons = 0;
     }
+
+
+    public void add(int index,int x) {
+
+            if (index < 0 || index > size) {
+                throw new IndexOutOfBoundsException("Index: " + index);
+            }
+
+            if (index == size){
+                add(x);
+                return;
+            }
+
+            Node newNode = new Node(x);
+
+            if (index == 0) {
+                newNode.next = head;
+                moves++;
+
+                head = newNode;
+                moves++;
+            } else {
+                Node previous = head;
+
+                for(int i = 0; i < index - 1; i++) {
+                    previous = previous.next;
+                    steps++;
+                }
+
+                newNode.next = previous.next;
+                moves++;
+
+                previous.next = newNode;
+                moves++;
+            }
+
+            size++;
+
+    }
 }
