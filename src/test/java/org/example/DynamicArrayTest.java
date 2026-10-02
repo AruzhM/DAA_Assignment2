@@ -118,8 +118,9 @@ public class DynamicArrayTest {
         array.add(50);
         assertEquals(50, array.get(0));
     }
+
     @Test
-    void searchesOnlyStoredElements()  {
+    void searchesOnlyStoredElements() {
         DynamicArray array = new DynamicArray();
 
         assertFalse(array.contains(0));
@@ -158,4 +159,80 @@ public class DynamicArrayTest {
         assertEquals(10, array.get(0));
     }
 
+    @Test
+    void countsAccessAndSearchOperations() {
+        DynamicArray array = new DynamicArray();
+        array.add(10);
+        array.add(20);
+        array.add(30);
+        array.resetMetrics();
+
+
+        assertEquals(20, array.get(1));
+        assertEquals(1L, array.getSteps());
+        assertEquals(0L, array.getMoves());
+        assertEquals(0L, array.getComparisons());
+
+        array.resetMetrics();
+
+        assertTrue(array.contains(20));
+        assertEquals(2L, array.getSteps());
+        assertEquals(2L, array.getComparisons());
+
+        array.resetMetrics();
+
+        assertFalse(array.contains(99));
+        assertEquals(3L, array.getSteps());
+        assertEquals(3L, array.getComparisons());
+    }
+
+    @Test
+    void countsInsertionAndRemovalOperations() {
+        DynamicArray array = new DynamicArray();
+        array.add(10);
+        array.add(20);
+        array.add(30);
+        array.resetMetrics();
+
+        array.add(1, 99);
+
+        assertEquals(2L, array.getSteps());
+        assertEquals(2L, array.getMoves());
+        assertEquals(0L, array.getComparisons());
+
+        array.resetMetrics();
+
+        assertEquals(99, array.remove(1));
+
+        assertEquals(3L, array.getSteps());
+        assertEquals(2L, array.getMoves());
+        assertEquals(0L, array.getComparisons());
+    }
+
+    @Test
+    void countsResizingAndResetsMetrics() {
+        DynamicArray array = new DynamicArray();
+
+        for (int i = 0; i < 10; i++) {
+            array.add(i);
+        }
+
+        array.resetMetrics();
+        array.add(10);
+
+        assertEquals(10L, array.getSteps());
+        assertEquals(10L, array.getMoves());
+        assertEquals(0L, array.getComparisons());
+
+        array.contains(0);
+        array.resetMetrics();
+
+        assertEquals(0L, array.getSteps());
+        assertEquals(0L, array.getMoves());
+        assertEquals(0L, array.getComparisons());
+        assertEquals(11, array.size());
+    }
+
+
 }
+
