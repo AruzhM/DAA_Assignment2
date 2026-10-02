@@ -33,4 +33,27 @@ public class DynamicArray {
     }
 
 
+    public void add(int index, int x) {
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index);
+        }
+
+        if (size == data.length) {
+            int[] newData = new int[data.length * 2];
+
+            for (int i = 0; i < size; i++) {
+                newData[i] = data[i];
+            }
+
+            data = newData;
+        }
+
+        for (int i = size; i > index; i--) {
+            data[i] = data[i - 1];
+        }
+
+        data[index] = x;
+        size++;
+    }
+
 }
