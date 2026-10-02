@@ -72,5 +72,63 @@ public class MinHeap {
 
         data[index] = x;
     }
+
+    public int extractMin() {
+        if (size == 0) {
+            throw new IllegalStateException("Heap is empty");
+        }
+
+        int minimum = data[0];
+        steps++;
+        size--;
+
+        if (size > 0) {
+            data[0] = data[size];
+            steps++;
+            moves++;
+
+            siftDown(0);
+        }
+        return minimum;
+    }
+
+    private void siftDown(int index) {
+        int value = data[index];
+        steps++;
+
+        while (index < size / 2) {
+            int left = 2 * index + 1;
+            int right = left + 1;
+
+            int smallerChild = left;
+            int smallerValue = data[left];
+            steps++;
+
+            if (right < size) {
+                int rightValue = data[right];
+                steps++;
+                comparisons++;
+
+                if (rightValue < smallerValue) {
+                    smallerChild = right;
+                    smallerValue = rightValue;
+                }
+            }
+
+            comparisons++;
+
+            if (value <= smallerValue) {
+                break;
+            }
+
+            data[index] = smallerValue;
+            moves++;
+
+            index = smallerChild;
+        }
+
+        data[index] = value;
+        moves++;
+    }
 }
 

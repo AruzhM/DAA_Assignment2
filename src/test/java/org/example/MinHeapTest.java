@@ -73,4 +73,83 @@ public class MinHeapTest {
         assertEquals(2, heap.size());
     }
 
+
+    @Test
+    void rejectsExtractionFromEmptyHeap() {
+        MinHeap heap = new MinHeap();
+
+        assertThrows(IllegalStateException.class,
+                () -> heap.extractMin());
+
+        assertEquals(0, heap.size());
+    }
+
+
+    @Test
+    void extractsValuesInSortedOrder() {
+        MinHeap heap = new MinHeap();
+
+        int[] values = {10, 4, 20, -5, 4, 0, 8};
+        int[] expected = {-5, 0, 4, 4, 8, 10, 20};
+
+        for (int value : values) {
+            heap.insert(value);
+        }
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], heap.peekMin());
+            assertEquals(expected[i], heap.extractMin());
+            assertEquals(expected.length - i - 1, heap.size());
+        }
+
+        assertThrows(IllegalStateException.class,
+                () -> heap.peekMin());
+        assertThrows(IllegalStateException.class,
+                () -> heap.extractMin());
+    }
+
+    @Test
+    void countsExtractionOperations() {
+        MinHeap heap = new MinHeap();
+        heap.insert(1);
+        heap.insert(2);
+        heap.insert(3);
+        heap.resetMetrics();
+
+        assertEquals(1, heap.extractMin());
+
+        assertEquals(4L, heap.getSteps());
+        assertEquals(3L, heap.getMoves());
+        assertEquals(1L, heap.getComparisons());
+
+        heap.resetMetrics();
+
+        assertEquals(2, heap.extractMin());
+        assertEquals(3L, heap.getSteps());
+        assertEquals(2L, heap.getMoves());
+        assertEquals(0L, heap.getComparisons());
+
+        heap.resetMetrics();
+
+        assertEquals(3, heap.extractMin());
+        assertEquals(1L, heap.getSteps());
+        assertEquals(0L, heap.getMoves());
+        assertEquals(0L, heap.getComparisons());
+    }
+
+    @Test
+    void canBeReusedAfterRemovingLastElement() {
+        MinHeap heap = new MinHeap();
+
+        heap.insert(7);
+        assertEquals(7, heap.extractMin());
+        assertEquals(0, heap.size());
+
+        heap.insert(-3);
+        heap.insert(9);
+
+        assertEquals(-3, heap.extractMin());
+        assertEquals(9, heap.extractMin());
+        assertEquals(0, heap.size());
+    }
+
 }
