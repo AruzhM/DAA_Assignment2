@@ -1,0 +1,96 @@
+DynamicArray, n=100
+org.example.DynamicArray@3c5a99dad footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1       656       656   [I
+         1        48        48   org.example.DynamicArray
+         2                 704   (total)
+
+
+MyLinkedList, n=100
+org.example.MyLinkedList@e580929d footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1        48        48   org.example.MyLinkedList
+       100        24      2400   org.example.MyLinkedList$Node
+       101                2448   (total)
+
+
+MinHeap, n=100
+org.example.MinHeap@614c5515d footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1       656       656   [I
+         1        48        48   org.example.MinHeap
+         2                 704   (total)
+
+
+DynamicArray, n=1000
+org.example.DynamicArray@6be46e8fd footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1      5136      5136   [I
+         1        48        48   org.example.DynamicArray
+         2                5184   (total)
+
+
+MyLinkedList, n=1000
+org.example.MyLinkedList@327471b5d footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1        48        48   org.example.MyLinkedList
+      1000        24     24000   org.example.MyLinkedList$Node
+      1001               24048   (total)
+
+
+MinHeap, n=1000
+org.example.MinHeap@5b0abc94d footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1      5136      5136   [I
+         1        48        48   org.example.MinHeap
+         2                5184   (total)
+
+
+DynamicArray, n=10000
+org.example.DynamicArray@1f1c7bf6d footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1     40976     40976   [I
+         1        48        48   org.example.DynamicArray
+         2               41024   (total)
+
+
+MyLinkedList, n=10000
+org.example.MyLinkedList@2b546384d footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1        48        48   org.example.MyLinkedList
+     10000        24    240000   org.example.MyLinkedList$Node
+     10001              240048   (total)
+
+
+MinHeap, n=10000
+org.example.MinHeap@506a1372d footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1     40976     40976   [I
+         1        48        48   org.example.MinHeap
+         2               41024   (total)
+
+
+DynamicArray, n=100000
+org.example.DynamicArray@77c233afd footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1    655376    655376   [I
+         1        48        48   org.example.DynamicArray
+         2              655424   (total)
+
+
+MyLinkedList, n=100000
+org.example.MyLinkedList@37c41ec0d footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1        48        48   org.example.MyLinkedList
+    100000        24   2400000   org.example.MyLinkedList$Node
+    100001             2400048   (total)
+
+
+MinHeap, n=100000
+org.example.MinHeap@bdc8448d footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+         1    655376    655376   [I
+         1        48        48   org.example.MinHeap
+         2              655424   (total)
+
+

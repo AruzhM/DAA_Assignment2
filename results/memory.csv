@@ -1,0 +1,13 @@
+structure,n,total_bytes,object_count,bytes_per_element
+DynamicArray,100,704,2,7.04
+MyLinkedList,100,2448,101,24.48
+MinHeap,100,704,2,7.04
+DynamicArray,1000,5184,2,5.18
+MyLinkedList,1000,24048,1001,24.05
+MinHeap,1000,5184,2,5.18
+DynamicArray,10000,41024,2,4.10
+MyLinkedList,10000,240048,10001,24.00
+MinHeap,10000,41024,2,4.10
+DynamicArray,100000,655424,2,6.55
+MyLinkedList,100000,2400048,100001,24.00
+MinHeap,100000,655424,2,6.55
