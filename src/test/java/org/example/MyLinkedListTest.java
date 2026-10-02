@@ -140,4 +140,89 @@ public class MyLinkedListTest {
         assertEquals(0L, list.getComparisons());
     }
 
+
+    @Test
+    void removesFromMiddleBeginningAndEnd() {
+        MyLinkedList list = new MyLinkedList();
+        list.add(10);
+        list.add(20);
+        list.add(30);
+        list.add(40);
+
+        assertEquals(20, list.remove(1));
+        assertEquals(3, list.size());
+        assertEquals(10, list.get(0));
+        assertEquals(30, list.get(1));
+        assertEquals(40, list.get(2));
+
+        assertEquals(40, list.remove(2));
+
+        list.add(50);
+        assertEquals(50, list.get(2));
+
+        assertEquals(10, list.remove(0));
+        assertEquals(30, list.remove(0));
+        assertEquals(50, list.remove(0));
+        assertEquals(0, list.size());
+
+        list.add(60);
+        assertEquals(1, list.size());
+        assertEquals(60, list.get(0));
+    }
+
+    @Test
+    void rejectsInvalidRemovalIndices() {
+        MyLinkedList list = new MyLinkedList();
+
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> list.remove(0));
+
+        list.add(10);
+
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> list.remove(-1));
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> list.remove(1));
+
+        assertEquals(1, list.size());
+        assertEquals(10, list.get(0));
+    }
+
+
+    @Test
+    void countsRemovalOperations() {
+        MyLinkedList list = new MyLinkedList();
+        list.add(10);
+        list.add(20);
+        list.add(30);
+        list.add(40);
+
+        list.resetMetrics();
+        assertEquals(30, list.remove(2));
+
+        assertEquals(2L, list.getSteps());
+        assertEquals(1L, list.getMoves());
+        assertEquals(0L, list.getComparisons());
+
+        list.resetMetrics();
+        assertEquals(40, list.remove(2));
+
+        assertEquals(2L, list.getSteps());
+        assertEquals(2L, list.getMoves());
+
+        list.resetMetrics();
+        assertEquals(10, list.remove(0));
+
+        assertEquals(1L, list.getSteps());
+        assertEquals(1L, list.getMoves());
+
+        list.resetMetrics();
+        assertEquals(20, list.remove(0));
+
+        assertEquals(1L, list.getSteps());
+        assertEquals(2L, list.getMoves());
+        assertEquals(0, list.size());
+    }
+
+
 }

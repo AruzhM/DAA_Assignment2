@@ -108,6 +108,47 @@ public class MyLinkedList {
             }
 
             size++;
+    }
 
+    public int remove(int index) {
+            if (index < 0 || index >= size) {
+                throw new IndexOutOfBoundsException("index: " + index);
+
+            }
+
+            Node removed;
+
+            if (index == 0) {
+                removed = head;
+                head = head.next;
+                steps++;
+                moves++;
+
+                if (size == 1) {
+                    tail = null;
+                    moves++;
+                }
+            } else {
+                Node previous = head;
+
+                for (int i = 0; i < index -1; i++) {
+                    previous = previous.next;
+                    steps++;
+                }
+
+                removed = previous.next;
+                steps++;
+
+                previous.next = removed.next;
+                moves++;
+
+                if (removed == tail) {
+                    tail = previous;
+                    moves++;
+                }
+            }
+
+            size--;
+            return removed.value;
     }
 }
