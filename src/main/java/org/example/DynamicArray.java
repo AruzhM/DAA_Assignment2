@@ -56,4 +56,28 @@ public class DynamicArray {
         size++;
     }
 
+    public int remove(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index);
+        }
+
+        int removed = data[index];
+
+        for (int i = index; i < size - 1; i++) {
+            data[i] = data[i+1];
+        }
+
+        size--;
+        return removed;
+    }
+
+    public boolean contains(int x) {
+        for (int i = 0; i < size; i++) {
+            if (data[i] == x) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

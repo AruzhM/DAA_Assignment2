@@ -91,4 +91,71 @@ public class DynamicArrayTest {
         assertEquals(0, array.size());
     }
 
+    @Test
+    void removesFromMiddleBeginningAndEnd() {
+        DynamicArray array = new DynamicArray();
+        array.add(10);
+        array.add(20);
+        array.add(30);
+        array.add(40);
+
+        assertEquals(20, array.remove(1));
+        assertEquals(3, array.size());
+        assertEquals(10, array.get(0));
+        assertEquals(30, array.get(1));
+        assertEquals(40, array.get(2));
+
+
+        assertEquals(10, array.remove(0));
+        assertEquals(40, array.remove(1));
+        assertEquals(1, array.size());
+        assertEquals(30, array.get(0));
+
+
+        assertEquals(30, array.remove(0));
+        assertEquals(0, array.size());
+
+        array.add(50);
+        assertEquals(50, array.get(0));
+    }
+    @Test
+    void searchesOnlyStoredElements()  {
+        DynamicArray array = new DynamicArray();
+
+        assertFalse(array.contains(0));
+
+        array.add(-5);
+        array.add(7);
+        array.add(7);
+
+        assertTrue(array.contains(-5));
+        assertTrue(array.contains(7));
+        assertFalse(array.contains(99));
+
+        array.remove(1);
+        assertTrue(array.contains(7));
+
+        array.remove(1);
+        assertFalse(array.contains(7));
+    }
+
+
+    @Test
+    void rejectsInvalidRemovalIndices() {
+        DynamicArray array = new DynamicArray();
+
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> array.remove(0));
+
+        array.add(10);
+
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> array.remove(-1));
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> array.remove(1));
+
+        assertEquals(1, array.size());
+        assertEquals(10, array.get(0));
+    }
+
 }
