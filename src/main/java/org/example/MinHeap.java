@@ -130,5 +130,17 @@ public class MinHeap {
         data[index] = value;
         moves++;
     }
+
+    boolean isValidHeap() {
+        for (int child = 1; child < size; child++) {
+            int parent = (child - 1) / 2;
+
+            if (data[parent] > data[child]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
 

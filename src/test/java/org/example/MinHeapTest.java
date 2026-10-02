@@ -2,6 +2,9 @@ package org.example;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.PriorityQueue;
+import java.util.Random;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -151,5 +154,75 @@ public class MinHeapTest {
         assertEquals(9, heap.extractMin());
         assertEquals(0, heap.size());
     }
+
+
+    @Test
+    void preservesHeapPropertyAndExtractsInSortedOrder() {
+        MinHeap heap = new MinHeap();
+        Random random = new Random(42);
+
+        for (int i = 0; i < 1000; i++) {
+            heap.insert(random.nextInt(2001) - 1000);
+
+            assertTrue(heap.isValidHeap(),
+                    "Heap property broken after insertion " + i);
+        }
+
+        int previous = Integer.MIN_VALUE;
+
+        for (int i = 0; i < 1000; i++) {
+            int current = heap.extractMin();
+
+            assertTrue(previous <= current,
+                    "Extraction order broken at step " + i);
+            assertTrue(heap.isValidHeap(),
+                    "Heap property broken after extraction " + i);
+            assertEquals(999 - i, heap.size());
+
+            previous = current;
+        }
+    }
+
+    @Test
+    void matchesPriorityQueueOnRandomOperations() {
+        MinHeap actual = new MinHeap();
+        PriorityQueue<Integer> expected = new PriorityQueue<>();
+        Random random = new Random(42);
+
+        for (int step = 0; step < 2000; step++) {
+            if (expected.isEmpty() || random.nextBoolean()) {
+                int value = random.nextInt();
+
+                actual.insert(value);
+                expected.add(value);
+            } else {
+                assertEquals(expected.remove().intValue(),
+                        actual.extractMin(),
+                        "Extraction mismatch at step " + step);
+            }
+
+            assertEquals(expected.size(), actual.size(),
+                    "Size mismatch at step " + step);
+            assertTrue(actual.isValidHeap(),
+                    "Heap property broken at step " + step);
+
+            if (!expected.isEmpty()) {
+                assertEquals(expected.peek().intValue(),
+                        actual.peekMin(),
+                        "Minimum mismatch at step " + step);
+            }
+        }
+
+        while (!expected.isEmpty()) {
+            assertEquals(expected.remove().intValue(),
+                    actual.extractMin());
+            assertTrue(actual.isValidHeap());
+        }
+
+        assertEquals(0, actual.size());
+        assertThrows(IllegalStateException.class,
+                () -> actual.extractMin());
+    }
+
 
 }
