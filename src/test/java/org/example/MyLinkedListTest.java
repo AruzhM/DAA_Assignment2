@@ -225,4 +225,64 @@ public class MyLinkedListTest {
     }
 
 
+    @Test
+    void searchesStoredValues() {
+        MyLinkedList list = new MyLinkedList();
+
+        assertFalse(list.contains(0));
+
+        list.add(-5);
+        list.add(7);
+        list.add(7);
+
+        assertTrue(list.contains(-5));
+        assertTrue(list.contains(7));
+        assertFalse(list.contains(99));
+
+        list.remove(1);
+        assertTrue(list.contains(7));
+
+        list.remove(1);
+        assertFalse(list.contains(7));
+
+        list.remove(0);
+        assertFalse(list.contains(-5));
+
+    }
+
+    @Test
+    void countsSearchOperations() {
+        MyLinkedList list = new MyLinkedList();
+
+        assertFalse(list.contains(10));
+        assertEquals(0L, list.getSteps());
+        assertEquals(0L, list.getComparisons());
+
+        list.add(10);
+        list.add(20);
+        list.add(30);
+
+        list.resetMetrics();
+        assertTrue(list.contains(10));
+
+        assertEquals(0L, list.getSteps());
+        assertEquals(1L, list.getComparisons());
+        assertEquals(0L, list.getMoves());
+
+        list.resetMetrics();
+        assertTrue(list.contains(30));
+
+        assertEquals(2L, list.getSteps());
+        assertEquals(3L, list.getComparisons());
+        assertEquals(0L, list.getMoves());
+
+        list.resetMetrics();
+        assertFalse(list.contains(99));
+
+        assertEquals(3L, list.getSteps());
+        assertEquals(3L, list.getComparisons());
+        assertEquals(0L, list.getMoves());
+        assertEquals(3, list.size());
+    }
+
 }

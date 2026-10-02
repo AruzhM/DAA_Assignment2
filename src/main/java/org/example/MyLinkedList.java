@@ -10,17 +10,18 @@ public class MyLinkedList {
             this.value = value;
         }
     }
-        private Node head;
-        private Node tail;
-        private int size = 0;
 
-        private long steps = 0;
-        private long moves = 0;
-        private long comparisons = 0;
+    private Node head;
+    private Node tail;
+    private int size = 0;
 
-        public int size() {
-            return size;
-        }
+    private long steps = 0;
+    private long moves = 0;
+    private long comparisons = 0;
+
+    public int size() {
+        return size;
+    }
 
 
     public void add(int x) {
@@ -40,7 +41,7 @@ public class MyLinkedList {
     }
 
     public int get(int index) {
-        if (index < 0 ||index >= size) {
+        if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Index: " + index);
         }
 
@@ -73,82 +74,99 @@ public class MyLinkedList {
     }
 
 
-    public void add(int index,int x) {
+    public void add(int index, int x) {
 
-            if (index < 0 || index > size) {
-                throw new IndexOutOfBoundsException("Index: " + index);
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index);
+        }
+
+        if (index == size) {
+            add(x);
+            return;
+        }
+
+        Node newNode = new Node(x);
+
+        if (index == 0) {
+            newNode.next = head;
+            moves++;
+
+            head = newNode;
+            moves++;
+        } else {
+            Node previous = head;
+
+            for (int i = 0; i < index - 1; i++) {
+                previous = previous.next;
+                steps++;
             }
 
-            if (index == size){
-                add(x);
-                return;
-            }
+            newNode.next = previous.next;
+            moves++;
 
-            Node newNode = new Node(x);
+            previous.next = newNode;
+            moves++;
+        }
 
-            if (index == 0) {
-                newNode.next = head;
-                moves++;
-
-                head = newNode;
-                moves++;
-            } else {
-                Node previous = head;
-
-                for(int i = 0; i < index - 1; i++) {
-                    previous = previous.next;
-                    steps++;
-                }
-
-                newNode.next = previous.next;
-                moves++;
-
-                previous.next = newNode;
-                moves++;
-            }
-
-            size++;
+        size++;
     }
 
     public int remove(int index) {
-            if (index < 0 || index >= size) {
-                throw new IndexOutOfBoundsException("index: " + index);
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("index: " + index);
 
+        }
+
+        Node removed;
+
+        if (index == 0) {
+            removed = head;
+            head = head.next;
+            steps++;
+            moves++;
+
+            if (size == 1) {
+                tail = null;
+                moves++;
+            }
+        } else {
+            Node previous = head;
+
+            for (int i = 0; i < index - 1; i++) {
+                previous = previous.next;
+                steps++;
             }
 
-            Node removed;
+            removed = previous.next;
+            steps++;
 
-            if (index == 0) {
-                removed = head;
-                head = head.next;
-                steps++;
+            previous.next = removed.next;
+            moves++;
+
+            if (removed == tail) {
+                tail = previous;
                 moves++;
+            }
+        }
 
-                if (size == 1) {
-                    tail = null;
-                    moves++;
-                }
-            } else {
-                Node previous = head;
+        size--;
+        return removed.value;
+    }
 
-                for (int i = 0; i < index -1; i++) {
-                    previous = previous.next;
-                    steps++;
-                }
+    public boolean contains(int x) {
+        Node current = head;
 
-                removed = previous.next;
-                steps++;
+        while (current != null) {
+            comparisons++;
 
-                previous.next = removed.next;
-                moves++;
-
-                if (removed == tail) {
-                    tail = previous;
-                    moves++;
-                }
+            if (current.value == x) {
+                return true;
             }
 
-            size--;
-            return removed.value;
+            current = current.next;
+            steps++;
+        }
+
+        return false;
     }
 }
