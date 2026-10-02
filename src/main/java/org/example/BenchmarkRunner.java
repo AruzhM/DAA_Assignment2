@@ -43,6 +43,9 @@ public class BenchmarkRunner {
 
             benchmarkW3("DynamicArray", n, "middle", csv);
             benchmarkW3("MyLinkedList", n, "middle", csv);
+
+            int[] heapValues = createHeapValues(n);
+            benchmarkW4(n, heapValues, csv);
         }
 
         Path output = Path.of("results", "results.csv");
@@ -62,6 +65,7 @@ public class BenchmarkRunner {
 
         return indices;
     }
+
     private static IntList createList(String structure, int n) {
         IntList list;
 
@@ -114,7 +118,7 @@ public class BenchmarkRunner {
         if (list.getSteps() != expectedSteps
                 || list.getMoves() != 0
                 || list.getComparisons() != 0) {
-           throw new IllegalStateException("W1 metrics mismatch");
+            throw new IllegalStateException("W1 metrics mismatch");
         }
 
         return new Measurement(
@@ -179,6 +183,7 @@ public class BenchmarkRunner {
 
         return queries;
     }
+
     private static Measurement runW2(
             String structure, int n, int[] queries
     ) {
@@ -264,100 +269,195 @@ public class BenchmarkRunner {
         System.out.print(row);
     }
 
-        private static Measurement runW3(
-                String structure, int n, String variant
+    private static Measurement runW3(
+            String structure, int n, String variant
     ) {
-            IntList list = createList(structure, n);
+        IntList list = createList(structure, n);
 
-            int index;
+        int index;
 
-            if (variant.equals("head")) {
-                index = 0;
-            } else if (variant.equals("middle")) {
-                index = n / 2;
-            } else {
-                throw new IllegalArgumentException(
-                        "Unknown variant: " + variant
-                );
-            }
-
-            long checksum = 0;
-
-            long start = System.nanoTime();
-
-            for (int i = 0; i < 1000; i++) {
-                list.add(index, -1);
-                checksum += list.remove(index);
-            }
-
-            long elapsed = System.nanoTime() - start;
-            sink = checksum;
-
-            Measurement result = new Measurement(
-                    elapsed,
-                    list.getSteps(),
-                    list.getMoves(),
-                    list.getComparisons()
+        if (variant.equals("head")) {
+            index = 0;
+        } else if (variant.equals("middle")) {
+            index = n / 2;
+        } else {
+            throw new IllegalArgumentException(
+                    "Unknown variant: " + variant
             );
-
-            if (checksum != -1000 || list.size() != n) {
-                throw new IllegalStateException("W3 result mismatch");
-            }
-            int[] checkIndices = {0, n / 2, n - 1};
-
-            for (int i : checkIndices) {
-                if (list.get(i) != i) {
-                    throw new IllegalStateException(
-                            "W3 contents mismatch at index " + i
-                    );
-                }
-            }
-
-            if (result.comparisons() != 0) {
-                throw new IllegalStateException(
-                        "W3 unexpected value comparisons"
-                );
-            }
-
-            return result;
         }
 
+        long checksum = 0;
 
-            private static void benchmarkW3(
-                    String structure, int n, String variant,
-                    StringBuilder csv
-            ) {
-                for (int warmup = 0; warmup < 5; warmup++) {
-                    runW3(structure, n, variant);
-                }
+        long start = System.nanoTime();
 
-                Measurement[] results = new Measurement[RUNS];
+        for (int i = 0; i < 1000; i++) {
+            list.add(index, -1);
+            checksum += list.remove(index);
+        }
 
-                for (int run = 0; run < RUNS; run++) {
-                    results[run] = runW3(structure, n, variant);
-                }
+        long elapsed = System.nanoTime() - start;
+        sink = checksum;
 
-                Arrays.sort(results,
-                        (a, b) -> Long.compare(a.nanos(), b.nanos()));
+        Measurement result = new Measurement(
+                elapsed,
+                list.getSteps(),
+                list.getMoves(),
+                list.getComparisons()
+        );
 
-                Measurement median = results[RUNS / 2];
+        if (checksum != -1000 || list.size() != n) {
+            throw new IllegalStateException("W3 result mismatch");
+        }
+        int[] checkIndices = {0, n / 2, n - 1};
 
-                String row = String.format(
-                        Locale.US,
-                        "W3,%s,%s,%d,%.6f,%d,%d,%d%n",
-                        variant,
-                        structure,
-                        n,
-                        median.nanos() / 1_000_000.0,
-                        median.steps(),
-                        median.moves(),
-                        median.comparisons()
+        for (int i : checkIndices) {
+            if (list.get(i) != i) {
+                throw new IllegalStateException(
+                        "W3 contents mismatch at index " + i
                 );
-
-                csv.append(row);
-                System.out.print(row);
             }
+        }
+
+        if (result.comparisons() != 0) {
+            throw new IllegalStateException(
+                    "W3 unexpected value comparisons"
+            );
+        }
+
+        return result;
     }
+
+
+    private static void benchmarkW3(
+            String structure, int n, String variant,
+            StringBuilder csv
+    ) {
+        for (int warmup = 0; warmup < 5; warmup++) {
+            runW3(structure, n, variant);
+        }
+
+        Measurement[] results = new Measurement[RUNS];
+
+        for (int run = 0; run < RUNS; run++) {
+            results[run] = runW3(structure, n, variant);
+        }
+
+        Arrays.sort(results,
+                (a, b) -> Long.compare(a.nanos(), b.nanos()));
+
+        Measurement median = results[RUNS / 2];
+
+        String row = String.format(
+                Locale.US,
+                "W3,%s,%s,%d,%.6f,%d,%d,%d%n",
+                variant,
+                structure,
+                n,
+                median.nanos() / 1_000_000.0,
+                median.steps(),
+                median.moves(),
+                median.comparisons()
+        );
+
+        csv.append(row);
+        System.out.print(row);
+    }
+
+    private static int[] createHeapValues(int n) {
+        Random random = new Random(42);
+        int[] values = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            values[i] = random.nextInt();
+        }
+
+        return values;
+    }
+
+    private static Measurement runW4(int[] values) {
+        MinHeap heap = new MinHeap();
+        int[] extracted = new int[values.length];
+
+        long start = System.nanoTime();
+
+        for (int value : values) {
+            heap.insert(value);
+        }
+
+        for (int i = 0; i < extracted.length; i++) {
+            extracted[i] = heap.extractMin();
+        }
+
+        long elapsed = System.nanoTime() - start;
+
+        Measurement result = new Measurement(
+                elapsed,
+                heap.getSteps(),
+                heap.getMoves(),
+                heap.getComparisons()
+        );
+
+        long checksum = 0;
+
+        for (int i = 0; i < extracted.length; i++) {
+            checksum += extracted[i];
+
+            if (i > 0 && extracted[i - 1] > extracted[i]) {
+                throw new IllegalStateException(
+                        "W4 extraction order mismatch at index " + i
+                );
+            }
+        }
+
+        sink = checksum;
+
+
+        int[] expected = values.clone();
+        Arrays.sort(expected);
+
+        if (!Arrays.equals(expected, extracted)) {
+            throw new IllegalStateException("W4 contents mismatch");
+        }
+
+        if (heap.size() != 0) {
+            throw new IllegalStateException("W4 heap is not empty");
+        }
+
+        return result;
+    }
+
+    private static void benchmarkW4(
+            int n, int[] values, StringBuilder csv
+    ) {
+        for (int warmup = 0; warmup < 5; warmup++) {
+            runW4(values);
+        }
+
+        Measurement[] results = new Measurement[RUNS];
+
+        for (int run = 0; run < RUNS; run++) {
+            results[run] = runW4(values);
+        }
+
+        Arrays.sort(results,
+                (a, b) -> Long.compare(a.nanos(), b.nanos()));
+
+        Measurement median = results[RUNS / 2];
+
+        String row = String.format(
+                Locale.US,
+                "W4,-,MinHeap,%d,%.6f,%d,%d,%d%n",
+                n,
+                median.nanos() / 1_000_000.0,
+                median.steps(),
+                median.moves(),
+                median.comparisons()
+        );
+
+        csv.append(row);
+        System.out.print(row);
+    }
+}
 
 
 
