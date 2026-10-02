@@ -32,6 +32,11 @@ public class BenchmarkRunner {
 
             benchmarkW1("DynamicArray", n, indices, csv);
             benchmarkW1("MyLinkedList", n, indices, csv);
+
+            int[] queries = createQueries(n);
+
+            benchmarkW2("DynamicArray", n, queries, csv);
+            benchmarkW2("MyLinkedList", n, queries, csv);
         }
 
         Path output = Path.of("results", "results.csv");
@@ -137,6 +142,110 @@ public class BenchmarkRunner {
         String row = String.format(
                 Locale.US,
                 "W1,-,%s,%d,%.6f,%d,%d,%d%n",
+                structure,
+                n,
+                median.nanos() / 1_000_000.0,
+                median.steps(),
+                median.moves(),
+                median.comparisons()
+        );
+
+        csv.append(row);
+        System.out.print(row);
+    }
+
+    private static int[] createQueries(int n) {
+        Random random = new Random(42);
+        int[] queries = new int[1000];
+
+        for (int i = 0; i < 500; i++) {
+            queries[i] = random.nextInt(n);
+            queries[i + 500] = n + random.nextInt(n);
+        }
+
+        for (int i = queries.length - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+
+            int temporary = queries[i];
+            queries[i] = queries[j];
+            queries[j] = temporary;
+        }
+
+        return queries;
+    }
+    private static Measurement runW2(
+            String structure, int n, int[] queries
+    ) {
+        IntList list = createList(structure, n);
+        int found = 0;
+
+        long start = System.nanoTime();
+
+        for (int value : queries) {
+            if (list.contains(value)) {
+                found++;
+            }
+        }
+        long elapsed = System.nanoTime() - start;
+        sink = found;
+
+        if (found != 500) {
+            throw new IllegalStateException("W2 result mismatch");
+        }
+
+        long expectedComparisons = 0;
+        long expectedListSteps = 0;
+
+        for (int value : queries) {
+            if (value < n) {
+                expectedComparisons += value + 1L;
+                expectedListSteps += value;
+            } else {
+                expectedComparisons += n;
+                expectedListSteps += n;
+            }
+        }
+
+        long expectedSteps = structure.equals("DynamicArray")
+                ? expectedComparisons
+                : expectedListSteps;
+
+        if (list.getSteps() != expectedSteps
+                || list.getMoves() != 0
+                || list.getComparisons() != expectedComparisons) {
+            throw new IllegalStateException("W2 metrics mismatch");
+        }
+
+        return new Measurement(
+                elapsed,
+                list.getSteps(),
+                list.getMoves(),
+                list.getComparisons()
+        );
+    }
+
+    private static void benchmarkW2(
+            String structure, int n, int[] queries,
+            StringBuilder csv
+    ) {
+        for (int warmup = 0; warmup < 5; warmup++) {
+            runW2(structure, n, queries);
+        }
+
+        Measurement[] results = new Measurement[RUNS];
+
+        for (int run = 0; run < RUNS; run++) {
+            results[run] = runW2(structure, n, queries);
+        }
+
+        Arrays.sort(results,
+                (a, b) -> Long.compare(a.nanos(), b.nanos()));
+
+        Measurement median = results[RUNS / 2];
+
+        String row = String.format(
+                Locale.US,
+                "W2,-,%s,%d,%.6f,%d,%d,%d%n",
                 structure,
                 n,
                 median.nanos() / 1_000_000.0,
