@@ -1,6 +1,6 @@
 package org.example;
 
-public class DynamicArray {
+public class DynamicArray implements IntList {
 
     private int[] data = new int[10];
     private int size = 0;
