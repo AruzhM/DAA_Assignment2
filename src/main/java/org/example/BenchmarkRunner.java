@@ -66,32 +66,65 @@ public class BenchmarkRunner {
         return indices;
     }
 
-    private static IntList createList(String structure, int n) {
-        IntList list;
+    private static int[] createListValues(int n) {
+        int[] values = new int[n];
 
-        if (structure.equals("DynamicArray")) {
-            list = new DynamicArray();
-        } else if (structure.equals("MyLinkedList")) {
-            list = new MyLinkedList();
-        } else {
-            throw new IllegalArgumentException(
-                    "Unknown structure: " + structure
-            );
-        }
         for (int i = 0; i < n; i++) {
-            list.add(i);
+            values[i] = i;
         }
 
-        list.resetMetrics();
-        return list;
+        Random random = new Random(42);
+
+        for (int i = n - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+
+            int temporary = values[i];
+            values[i] = values[j];
+            values[j] = temporary;
+        }
+
+        return values;
     }
+
+
+             private static IntList createList(String structure, int n) {
+             IntList list;
+
+             if (structure.equals("DynamicArray")) {
+                 list = new DynamicArray();
+             } else if (structure.equals("MyLinkedList")) {
+                 list = new MyLinkedList();
+             } else {
+                 throw new IllegalArgumentException(
+                         "Unknown structure: " + structure
+                 );
+             }
+
+             int[] values = createListValues(n);
+
+             for (int value : values) {
+                 list.add(value);
+             }
+
+             list.resetMetrics();
+             return list;
+         }
 
     private static Measurement runW1(
             String structure, int n, int[] indices
     ) {
         IntList list = createList(structure, n);
-        long checksum = 0;
+        int[] values = createListValues(n);
 
+        long expectedChecksum = 0;
+        long expectedListSteps = 0;
+
+        for (int index : indices) {
+            expectedChecksum += values[index];
+            expectedListSteps += index;
+        }
+
+        long checksum = 0;
         long start = System.nanoTime();
 
         for (int index : indices) {
@@ -101,19 +134,13 @@ public class BenchmarkRunner {
         long elapsed = System.nanoTime() - start;
         sink = checksum;
 
-        long expectedChecksum = 0;
-
-        for (int index : indices) {
-            expectedChecksum += index;
-        }
-
         if (checksum != expectedChecksum) {
             throw new IllegalStateException("W1 checksum mismatch");
         }
 
         long expectedSteps = structure.equals("DynamicArray")
                 ? indices.length
-                : expectedChecksum;
+                : expectedListSteps;
 
         if (list.getSteps() != expectedSteps
                 || list.getMoves() != 0
@@ -188,8 +215,37 @@ public class BenchmarkRunner {
             String structure, int n, int[] queries
     ) {
         IntList list = createList(structure, n);
-        int found = 0;
+        int[] values = createListValues(n);
+        int[] positions = new int[n];
 
+        for (int i = 0; i < n; i++) {
+            positions[values[i]] = i;
+        }
+
+        long expectedComparisons = 0;
+        long expectedListSteps = 0;
+        int expectedFound = 0;
+
+        for (int value : queries) {
+            if (value >= 0 && value < n) {
+                int position = positions[value];
+
+                expectedFound++;
+                expectedComparisons += position + 1L;
+                expectedListSteps += position;
+            } else {
+                expectedComparisons += n;
+                expectedListSteps += n;
+            }
+        }
+
+        if (expectedFound != 500) {
+            throw new IllegalStateException(
+                    "W2 must contain exactly 500 successful queries"
+            );
+        }
+
+        int found = 0;
         long start = System.nanoTime();
 
         for (int value : queries) {
@@ -197,24 +253,12 @@ public class BenchmarkRunner {
                 found++;
             }
         }
+
         long elapsed = System.nanoTime() - start;
         sink = found;
 
-        if (found != 500) {
+        if (found != expectedFound) {
             throw new IllegalStateException("W2 result mismatch");
-        }
-
-        long expectedComparisons = 0;
-        long expectedListSteps = 0;
-
-        for (int value : queries) {
-            if (value < n) {
-                expectedComparisons += value + 1L;
-                expectedListSteps += value;
-            } else {
-                expectedComparisons += n;
-                expectedListSteps += n;
-            }
         }
 
         long expectedSteps = structure.equals("DynamicArray")
@@ -308,10 +352,12 @@ public class BenchmarkRunner {
         if (checksum != -1000 || list.size() != n) {
             throw new IllegalStateException("W3 result mismatch");
         }
+        int[] expectedValues = createListValues(n);
+
         int[] checkIndices = {0, n / 2, n - 1};
 
         for (int i : checkIndices) {
-            if (list.get(i) != i) {
+            if (list.get(i) != expectedValues[i]) {
                 throw new IllegalStateException(
                         "W3 contents mismatch at index " + i
                 );
@@ -456,6 +502,8 @@ public class BenchmarkRunner {
 
         csv.append(row);
         System.out.print(row);
+
+
     }
 }
 

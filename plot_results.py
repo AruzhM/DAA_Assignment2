@@ -322,7 +322,7 @@ def plot_memory(rows):
 
         ax.plot(
             [int(row["n"]) for row in data],
-            [int(row["total_bytes"]) / 1024 for row in data],
+            [int(row["total_bytes"]) / 1_000_000 for row in data],
             label=structure,
             color=COLORS[structure],
             marker=marker,
@@ -332,7 +332,7 @@ def plot_memory(rows):
             linewidth=1.8,
         )
 
-    configure_axis(ax, "Memory (KiB)", logarithmic_y=True)
+    configure_axis(ax, "Memory (MB)", logarithmic_y=True)
     ax.set_title("Memory vs n")
     add_legend(ax)
 

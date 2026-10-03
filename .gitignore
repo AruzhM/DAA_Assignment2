@@ -38,6 +38,9 @@ build/
 *.iml
 target/
 out/
+.venv/
+__pycache__/
+*.pyc
 
 ### Mac OS ###
 .DS_Store

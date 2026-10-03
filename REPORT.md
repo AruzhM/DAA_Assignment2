@@ -32,6 +32,11 @@ checks are outside the timed section. For W1–W3, initial list population
 is also outside the timed section. Counters are reset before measurement.
 Checksums are consumed through a volatile field.
 
+For W1–W3, both lists receive the same permutation of integers
+0 through n - 1, shuffled using Random(42). Successful search
+queries use values from this range; unsuccessful queries use
+values from n through 2n - 1.
+
 | Workload | Operations |
 |---|---|
 | W1 | 10,000 random indexed reads |
