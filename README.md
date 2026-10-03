@@ -189,7 +189,7 @@ explicitly at zero.
 
 ## Results and analysis
 
-See [REPORT.md](REPORT.md) for:
+See [Report](Report.pdf) for:
 
 - complexity analysis;
 - two loop-invariant proofs;
@@ -212,7 +212,7 @@ in the report.
 | plot_results.py | Plot generation |
 | results/ | CSV measurements and JOL details |
 | results/plots/ | Generated figures |
-| REPORT.md | Analysis and experimental discussion |
+| [Report](Report.pdf) | Analysis and experimental discussion |
 
 Generated build files, IDE settings, and the Python virtual
 environment should not be included in the submitted source archive.
